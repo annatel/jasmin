@@ -445,14 +445,8 @@ class SMPPClientSMListener:
         yield self.redisClient.expire(hashKey, 300)
 
         # This is the last part
-        if segment_seqnum == total_segments:
-            hvals = yield self.redisClient.hvals(hashKey)
-            if len(hvals) != total_segments:
-                self.log.warning(
-                    'Received the last part (msg_ref_num:%s) and did not find all parts in redis, data lost !',
-                    msg_ref_num)
-                return
-
+        hvals = yield self.redisClient.hvals(hashKey)
+        if len(hvals) == total_segments:            
             # Get PDUs
             pdus = {}
             for pickledValue in hvals:
